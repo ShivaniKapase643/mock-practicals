@@ -1,0 +1,84 @@
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    int n, W;
+
+    cout << "Enter number of items: ";
+    cin >> n;
+
+    cout << "Enter knapsack capacity: ";
+    cin >> W;
+
+    vector<int> profit(n), weight(n);
+
+    cout << "Enter profit and weight of each item:\n";
+
+    for (int i = 0; i < n; i++)
+    {
+        cout << "Item " << char('A' + i) << ": ";
+        cin >> profit[i] >> weight[i];
+    }
+
+    // Create DP table
+    vector<vector<int>> dp(n + 1,
+                           vector<int>(W + 1, 0));
+
+    // Dynamic Programming
+    for (int i = 1; i <= n; i++)
+    {
+        for (int w = 0; w <= W; w++)
+        {
+            if (weight[i - 1] <= w)
+            {
+                dp[i][w] = max(
+                    dp[i - 1][w],
+                    profit[i - 1] +
+                    dp[i - 1][w - weight[i - 1]]
+                );
+            }
+            else
+            {
+                dp[i][w] = dp[i - 1][w];
+            }
+        }
+    }
+
+    // Display DP Table
+    cout << "\nDynamic Programming Table:\n";
+
+    for (int i = 0; i <= n; i++)
+    {
+        for (int w = 0; w <= W; w++)
+        {
+            cout << dp[i][w] << "\t";
+        }
+        cout << endl;
+    }
+
+    // Find selected items
+    int w = W;
+
+    cout << "\nSelected Items: ";
+
+    for (int i = n; i > 0; i--)
+    {
+        if (dp[i][w] != dp[i - 1][w])
+        {
+            cout << char('A' + i - 1) << " ";
+
+            w = w - weight[i - 1];
+        }
+    }
+
+    // Display maximum profit
+    cout << "\nMaximum Profit: " << dp[n][W];
+
+    cout << "\n";
+
+    return 0;
+}

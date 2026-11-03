@@ -1,0 +1,108 @@
+
+#include <iostream>
+#include <queue>
+#include <string>
+#include <vector>
+using namespace std;
+
+// Structure for Huffman Tree Node
+struct Node
+{
+    char ch;
+    int freq;
+
+    Node *left, *right;
+
+    Node(char c, int f)
+    {
+        ch = c;
+        freq = f;
+        left = right = NULL;
+    }
+};
+
+// Comparator for Min Priority Queue
+struct Compare
+{
+    bool operator()(Node* a, Node* b)
+    {
+        return a->freq > b->freq;
+    }
+};
+
+// Generate Huffman Codes
+void printCodes(Node* root, string code)
+{
+    if (root == NULL)
+        return;
+
+    // If leaf node, print character and code
+    if (root->left == NULL && root->right == NULL)
+    {
+        cout << root->ch << " : " << code << endl;
+        return;
+    }
+
+    printCodes(root->left, code + "0");
+    printCodes(root->right, code + "1");
+}
+
+// Build Huffman Tree
+void buildHuffmanTree(char chars[], int freq[], int n)
+{
+    priority_queue<Node*, vector<Node*>, Compare> pq;
+
+    // Insert all characters into priority queue
+    for (int i = 0; i < n; i++)
+    {
+        pq.push(new Node(chars[i], freq[i]));
+    }
+
+    // Combine two smallest frequency nodes
+    while (pq.size() > 1)
+    {
+        Node* left = pq.top();
+        pq.pop();
+
+        Node* right = pq.top();
+        pq.pop();
+
+        Node* newNode = new Node('$',
+                                 left->freq + right->freq);
+
+        newNode->left = left;
+        newNode->right = right;
+
+        pq.push(newNode);
+    }
+
+    // Root node of Huffman Tree
+    Node* root = pq.top();
+
+    cout << "\nHuffman Codes:\n";
+
+    printCodes(root, "");
+}
+
+// Main Function
+int main()
+{
+    int n;
+
+    cout << "Enter number of characters: ";
+    cin >> n;
+
+    vector<char> chars(n);
+    vector<int> freq(n);
+
+    cout << "Enter characters and their frequencies:\n";
+
+    for (int i = 0; i < n; i++)
+    {
+        cin >> chars[i] >> freq[i];
+    }
+
+    buildHuffmanTree(chars.data(), freq.data(), n);
+
+    return 0;
+}
